@@ -1,0 +1,46 @@
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  application:
+    name: BQS-Main
+
+  batch:
+    jdbc:
+      initialize-schema: always
+    job:
+      enabled: false
+
+  datasource:
+    url: jdbc:h2:mem:patientDB
+    driver-class-name: org.h2.Driver
+    username: syf
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+s3:
+  aws:
+    accessKey: XXXX
+    secretKey: XXXX
+    region: ap-south-1
+    bucket: XXXX
+
+app:
+  scheduler:
+    enabled: false
+    cron: "0 */1 * * * *"
+
+server:
+  port: 8081
+
+logging:
+  level:
+    org.springframework.batch: DEBUG

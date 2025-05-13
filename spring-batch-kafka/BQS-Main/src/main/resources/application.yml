@@ -1,0 +1,71 @@
+spring:
+  sql:
+    init:
+      mode: always
+      schema-locations:
+        - classpath:org/springframework/batch/core/schema-h2.sql
+  main:
+    allow-bean-definition-overriding: true
+  application:
+    name: BQS-Main
+
+  batch:
+    initialize-schema: always
+    jpa:
+      defer-datasource-initialization: true
+    jdbc:
+      initialize-schema: always
+    job:
+      enabled: false  # manually triggered via REST/scheduler
+
+  datasource:
+    url: jdbc:h2:mem:patientDB
+    driver-class-name: org.h2.Driver
+    username: syf
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  kafka:
+    topic: amir-topic
+    groupId: 1
+    concurrency: 6
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: patient-group
+      auto-offset-reset: earliest
+      properties:
+        spring.json.trusted.packages: "*"
+        spring.json.use.type.headers: false
+        spring.json.value.default.type: com.bqs.main.model.PatientWrapper
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+s3:
+  aws:
+    accessKey: XXXX
+    secretKey: XXXX
+    region: ap-south-1
+    bucket: XXXX
+
+app:
+  scheduler:
+    enabled: true
+    cron: "0 */1 * * * *"
+
+server:
+  port: 8081
+
+logging:
+  level:
+    org.springframework.batch: DEBUG
+

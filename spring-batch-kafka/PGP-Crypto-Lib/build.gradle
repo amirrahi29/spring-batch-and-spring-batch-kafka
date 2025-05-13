@@ -1,0 +1,31 @@
+plugins {
+	id 'java'
+}
+
+group = 'com.pgp.crypto.lib'
+version = '1.0.0'
+
+java {
+	sourceCompatibility = JavaVersion.VERSION_17
+	targetCompatibility = JavaVersion.VERSION_17
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.bouncycastle:bcpg-jdk18on:1.78'
+}
+
+jar {
+	archiveBaseName = 'pgp-crypto-lib'
+	archiveVersion = ''
+	archiveClassifier = ''
+	manifest {
+		attributes(
+				'Implementation-Title': 'Hybrid Encryption Library',
+				'Implementation-Version': version
+		)
+	}
+}
