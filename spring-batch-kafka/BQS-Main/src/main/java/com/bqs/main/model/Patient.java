@@ -8,7 +8,8 @@ public class Patient {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long uniqueCorrelationID;
+    private Long id;
+    private String correlationID;
     private String firstName;
     private String lastName;
     private String addressLine1;
@@ -18,13 +19,19 @@ public class Patient {
     private String zipCode;
     private String email;
     private String merchantNumber;
+    private String ssn;
+    private String dob;
+    private String phoneNumber;
+    private String status;
+    private String referenceId;
 
     public Patient(){}
 
-    public Patient(Long id, String firstName, String lastName, String addressLine1,
-                   String addressLine2, String city, String state, String zipCode, String email,
-                   String merchantNumber) {
-        this.uniqueCorrelationID = uniqueCorrelationID;
+    public Patient(Long id, String correlationID, String firstName, String lastName, String addressLine1,
+                   String addressLine2, String city, String state, String zipCode, String email, String merchantNumber,
+                   String ssn, String dob, String phoneNumber, String status, String referenceId) {
+        this.id = id;
+        this.correlationID = correlationID;
         this.firstName = firstName;
         this.lastName = lastName;
         this.addressLine1 = addressLine1;
@@ -34,14 +41,27 @@ public class Patient {
         this.zipCode = zipCode;
         this.email = email;
         this.merchantNumber = merchantNumber;
+        this.ssn = ssn;
+        this.dob = dob;
+        this.phoneNumber = phoneNumber;
+        this.status = status;
+        this.referenceId = referenceId;
     }
 
     public Long getId() {
-        return uniqueCorrelationID;
+        return id;
     }
 
     public void setId(Long id) {
-        this.uniqueCorrelationID = id;
+        this.id = id;
+    }
+
+    public String getCorrelationID() {
+        return correlationID;
+    }
+
+    public void setCorrelationID(String correlationID) {
+        this.correlationID = correlationID;
     }
 
     public String getFirstName() {
@@ -114,5 +134,45 @@ public class Patient {
 
     public void setMerchantNumber(String merchantNumber) {
         this.merchantNumber = merchantNumber;
+    }
+
+    public String getSsn() {
+        return ssn;
+    }
+
+    public void setSsn(String ssn) {
+        this.ssn = ssn;
+    }
+
+    public String getDob() {
+        return dob;
+    }
+
+    public void setDob(String dob) {
+        this.dob = dob;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getReferenceId() {
+        return referenceId;
+    }
+
+    public void setReferenceId(String referenceId) {
+        this.referenceId = referenceId;
     }
 }

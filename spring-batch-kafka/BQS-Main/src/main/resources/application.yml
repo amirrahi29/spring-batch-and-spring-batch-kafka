@@ -1,22 +1,6 @@
 spring:
-  sql:
-    init:
-      mode: always
-      schema-locations:
-        - classpath:org/springframework/batch/core/schema-h2.sql
-  main:
-    allow-bean-definition-overriding: true
   application:
     name: BQS-Main
-
-  batch:
-    initialize-schema: always
-    jpa:
-      defer-datasource-initialization: true
-    jdbc:
-      initialize-schema: always
-    job:
-      enabled: false  # manually triggered via REST/scheduler
 
   datasource:
     url: jdbc:h2:mem:patientDB
@@ -34,18 +18,40 @@ spring:
       enabled: true
       path: /h2-console
 
+  batch:
+    job:
+      enabled: false
+    jdbc:
+      initialize-schema: always
+    jpa:
+      defer-datasource-initialization: true
+
+  sql:
+    init:
+      mode: always
+      schema-locations:
+        - classpath:org/springframework/batch/core/schema-h2.sql
+
   kafka:
+    bootstrap-servers: localhost:9092  # switch to live SSL brokers for prod
     topic: amir-topic
-    groupId: 1
     concurrency: 6
-    bootstrap-servers: localhost:9092
+
+    properties:
+      security.protocol: PLAINTEXT     # For production use: SSL
+      client.dns.lookup: use_all_dns_ips
+      api.version.request: true
+
     consumer:
       group-id: patient-group
       auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: "*"
         spring.json.use.type.headers: false
         spring.json.value.default.type: com.bqs.main.model.PatientWrapper
+
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
@@ -58,6 +64,11 @@ s3:
     bucket: XXXX
 
 app:
+  redis:
+    host: localhost
+    port: 6379
+    password: ""
+    expiration-seconds: 86400 # 1 day in seconds
   scheduler:
     enabled: true
     cron: "0 */1 * * * *"
@@ -68,4 +79,3 @@ server:
 logging:
   level:
     org.springframework.batch: DEBUG
-

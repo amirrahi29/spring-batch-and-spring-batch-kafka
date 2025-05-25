@@ -11,3 +11,4 @@ public class BqsMainApplication {
 		SpringApplication.run(BqsMainApplication.class, args);
 	}
 }
+ 

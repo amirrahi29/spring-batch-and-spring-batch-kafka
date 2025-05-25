@@ -1,7 +1,8 @@
-package com.bqs.main.s3;
+package com.bqs.main.service.s3;
 
 import com.bqs.main.utility.BaseLogger;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
@@ -10,6 +11,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
+
 import java.util.Date;
 import java.util.List;
 
@@ -35,11 +37,10 @@ public class ScheduledS3BatchTrigger extends BaseLogger {
     @Scheduled(cron = "${app.scheduler.cron}")
     public void runForEachFile() {
         if (!schedulerEnabled) {
+            log.info("Scheduler is disabled. Skipping run.");
             return;
         }
         log.info("Scheduler triggered!");
-        log.info("Scheduler running? enabled = {}", schedulerEnabled);
-
         List<S3ObjectSummary> files = s3Client.listObjects(bucketName).getObjectSummaries();
 
         for (S3ObjectSummary file : files) {
@@ -52,23 +53,16 @@ public class ScheduledS3BatchTrigger extends BaseLogger {
                         .addDate("time", new Date())
                         .toJobParameters();
 
-                var execution = jobLauncher.run(patientJob, params);
+                log.info("Triggering batch job for file: {}", fileKey);
+                JobExecution execution = jobLauncher.run(patientJob, params);
 
                 if (execution.getStatus().isUnsuccessful()) {
                     log.warn("Batch job failed for file: {}", fileKey);
                     continue;
                 }
-
-                log.info("Triggered batch job for file: {}", fileKey);
-
-                // Only delete if job was successful
-//                s3Client.deleteObject(bucketName, fileKey);
-                log.info("Deleted file from S3 after successful processing: {}", fileKey);
-
             } catch (Exception e) {
-                log.error("Failed to trigger batch job for file: {}", fileKey, e);
+                log.error("Failed to process file: " + fileKey, e);
             }
         }
     }
-
 }

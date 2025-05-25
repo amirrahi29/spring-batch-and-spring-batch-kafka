@@ -1,7 +1,7 @@
 package com.bqs.main.batch.listener;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.bqs.main.s3.S3InputStreamFetcher;
+import com.bqs.main.service.s3.S3InputStreamFetcher;
 import com.bqs.main.utility.BaseLogger;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
@@ -15,9 +15,6 @@ public class S3JobExecutionListener extends BaseLogger implements JobExecutionLi
     @Autowired
     private S3InputStreamFetcher s3Fetcher;
 
-    @Value("${app.scheduler.enabled:true}")
-    private boolean schedulerEnabled;
-
     @Autowired
     private AmazonS3 amazonS3;
 
@@ -27,7 +24,6 @@ public class S3JobExecutionListener extends BaseLogger implements JobExecutionLi
     @Override
     public void beforeJob(JobExecution jobExecution) {
         String fileKey = jobExecution.getJobParameters().getString("fileKey");
-
         if (!amazonS3.doesObjectExist(bucketName, fileKey)) {
             throw new RuntimeException("S3 file does not exist: " + fileKey);
         }
@@ -35,23 +31,17 @@ public class S3JobExecutionListener extends BaseLogger implements JobExecutionLi
 
     @Override
     public void afterJob(JobExecution jobExecution) {
-        if (!schedulerEnabled) {
-            log.info("Scheduler disabled, skipping file delete.");
-            return;
-        }
-
         String fileKey = jobExecution.getJobParameters().getString("fileKey");
-        if (jobExecution.getStatus().isUnsuccessful()) {
-            log.warn("Job failed for file: " + fileKey + ", skipping deletion.");
+
+        if (fileKey == null || fileKey.isBlank()) {
+            log.warn("No fileKey provided. Skipping deletion.");
             return;
         }
 
-        try {
-            s3Fetcher.deleteFile(fileKey);
-            log.info("Successfully deleted file from S3: {}", fileKey);
-        } catch (Exception e) {
-            log.error("Failed to delete file from S3: " + fileKey, e);
+        if (jobExecution.getStatus().isUnsuccessful()) {
+            log.warn("Job failed for file: {}. Skipping S3 deletion.", fileKey);
+            return;
         }
+
     }
 }
-
